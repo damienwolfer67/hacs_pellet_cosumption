@@ -4,18 +4,24 @@
 [![Home Assistant](https://img.shields.io/badge/Home_Assistant-2024.1.0+-blue.svg)](https://www.home-assistant.io)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
+[![Open your Home Assistant and add this repository](https://my.home-assistant.io/badges/add_integration.svg)](https://my.home-assistant.io/redirect_hacs_integration/?domain=pellet_consumption&repository=damienwolfer67%2Fhacs_pellet_cosumption)
+
 A Home Assistant custom integration to track your wood pellet consumption for pellet stoves and boilers. Track your silo level, daily consumption, estimated autonomy, and seasonal costs.
 
 ## Features
 
 - **Manual tracking**: Add pellets when you refill your silo
+- **Micronova AGUA IoT integration**: Automatic consumption tracking from compatible pellet stoves
+- **Stove monitoring**: Real-time status, power level, temperatures, and alarms
 - **Multiple sensors**: Daily consumption, remaining level, autonomy estimation, cost tracking
 - **Flexible configuration**: Customizable silo capacity, bag weight, and pellet price
 - **Statistics**: Automatic statistics in Home Assistant for historical graphs
-- **Multi-language**: English and French translations
+- **Multi-language**: English, French, German, Spanish, Italian, Dutch translations
 - **Services**: Easy control via Home Assistant services
 
 ## Sensors
+
+### Manual Tracking (always available)
 
 | Sensor | Unit | Description |
 |--------|------|-------------|
@@ -26,6 +32,21 @@ A Home Assistant custom integration to track your wood pellet consumption for pe
 | Remaining Pellets (%) | % | Percentage of silo capacity remaining |
 | Estimated Autonomy | days | Days remaining based on 7-day average |
 | Total Cost (season) | EUR | Total cost for current heating season |
+
+### Micronova AGUA IoT (when enabled)
+
+| Sensor | Description |
+|--------|-------------|
+| Stove Status | Current state (off, igniting, heating, temp reached, etc.) |
+| Stove Power Level | Current power level (0-5) |
+| Stove Ambient Temperature | Room temperature from stove |
+| Stove Setpoint Temperature | Target temperature |
+| Stove Runtime Today | Total running time today (hours) |
+| Estimated Consumption (stove) | Automatic consumption estimation from stove data |
+| Stove Alarms | Active alarms |
+| Stove Pellets Low | Low pellet indicator |
+
+**Supported brands**: Moretti Design, Thermorossi, Piazzetta, Nordica, Extraflame, Edilkamin (Micronova WiNET module)
 
 ## Installation
 
@@ -41,6 +62,15 @@ A Home Assistant custom integration to track your wood pellet consumption for pe
 8. Restart Home Assistant
 9. Go to "Settings" → "Devices & Services" → "Add Integration"
 10. Search for "Pellet Consumption Tracker" and follow the configuration wizard
+
+#### Micronova Integration (Optional)
+
+If your pellet stove has a WiNET module (Moretti Design, Thermorossi, Piazzetta, Nordica, Extraflame, Edilkamin):
+
+1. Enable "Micronova AGUA IoT integration" in the configuration
+2. Enter your stove's local IP address
+3. Customize consumption rates per power level if needed
+4. The integration will automatically track consumption from stove data
 
 ### Manual Installation
 

@@ -4,7 +4,7 @@
 [![Home Assistant](https://img.shields.io/badge/Home_Assistant-2024.1.0+-blue.svg)](https://www.home-assistant.io)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-[![Open your Home Assistant and add this repository](https://my.home-assistant.io/badges/add_integration.svg)](https://my.home-assistant.io/redirect_hacs_integration/?domain=pellet_consumption&repository=damienwolfer67%2Fhacs_pellet_cosumption)
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://camo.githubusercontent.com/49f849a6409cdcad49e32d41115ab078f810d960b35466436e028d4552aadd40/68747470733a2f2f6d792e686f6d652d617373697374616e742e696f2f6261646765732f686163735f7265706f7369746f72792e737667)](https://my.home-assistant.io/redirect_hacs_integration/?domain=pellet_consumption&repository=damienwolfer67%2Fhacs_pellet_cosumption&category=integration)
 
 A Home Assistant custom integration to track your wood pellet consumption for pellet stoves and boilers. Track your silo level, daily consumption, estimated autonomy, and seasonal costs.
 

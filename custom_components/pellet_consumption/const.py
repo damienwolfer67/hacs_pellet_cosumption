@@ -55,3 +55,47 @@ ICON_PERCENTAGE: Final = "mdi:percent"
 
 # Autonomy calculation
 AUTONOMY_DAYS_WINDOW: Final = 7  # Number of days to average for autonomy calculation
+
+# Micronova AGUA IoT integration
+CONF_MICRONOVA_ENABLED: Final = "micronova_enabled"
+CONF_MICRONOVA_HOST: Final = "micronova_host"
+CONF_CONSUMPTION_RATES: Final = "consumption_rates"
+
+# Default consumption rates per power level (kg/h)
+DEFAULT_CONSUMPTION_RATES: Final[dict[int, float]] = {
+    1: 0.5,  # Power 1: ~0.5 kg/h
+    2: 0.8,  # Power 2: ~0.8 kg/h
+    3: 1.2,  # Power 3: ~1.2 kg/h
+    4: 1.6,  # Power 4: ~1.6 kg/h
+    5: 2.0,  # Power 5: ~2.0 kg/h
+}
+
+# Micronova sensor keys
+SENSOR_STOVE_STATUS: Final = "stove_status"
+SENSOR_STOVE_POWER_LEVEL: Final = "stove_power_level"
+SENSOR_STOVE_AMBIENT_TEMP: Final = "stove_ambient_temp"
+SENSOR_STOVE_SETPOINT_TEMP: Final = "stove_setpoint_temp"
+SENSOR_STOVE_RUNTIME_TODAY: Final = "stove_runtime_today"
+SENSOR_ESTIMATED_CONSUMPTION_STOVE: Final = "estimated_consumption_stove"
+SENSOR_STOVE_ALARMS: Final = "stove_alarms"
+SENSOR_STOVE_PELLETS_LOW: Final = "stove_pellets_low"
+
+# Micronova icons
+ICON_STOVE: Final = "mdi:fireplace"
+ICON_THERMOMETER: Final = "mdi:thermometer"
+ICON_THERMOMETER_LOW: Final = "mdi:thermometer-low"
+ICON_POWER: Final = "mdi:fire"
+ICON_ALERT: Final = "mdi:alert-circle"
+ICON_CLOCK_ALERT: Final = "mdi:clock-alert"
+
+# Micronova status names
+MICRONOVA_STATUS_NAMES: Final[dict[int, str]] = {
+    0: "off",
+    1: "start",
+    2: "work",
+    3: "wait_on",
+    4: "temp_ok",
+    5: "wait_time",
+    6: "stop",
+    7: "sunout",
+}

@@ -8,12 +8,15 @@
           "silo_capacity_bags": "Capacità silo (numero di sacchi)",
           "bag_weight_kg": "Peso sacco (kg)",
           "pellet_price_eur_kg": "Prezzo pellet (€/kg)",
-          "name": "Nome istanza (opzionale)"
+          "name": "Nome istanza (opzionale)",
+          "micronova_enabled": "Attiva integrazione Micronova AGUA IoT",
+          "micronova_host": "Indirizzo IP stufa (Micronova)"
         }
       }
     },
     "error": {
-      "unknown": "Errore sconosciuto"
+      "unknown": "Errore sconosciuto",
+      "cannot_connect": "Impossibile connettersi alla stufa Micronova. Verificare l'indirizzo IP."
     },
     "abort": {
       "already_configured": "Questa istanza è già configurata"
@@ -27,55 +30,77 @@
         "data": {
           "silo_capacity_bags": "Capacità silo (numero di sacchi)",
           "bag_weight_kg": "Peso sacco (kg)",
-          "pellet_price_eur_kg": "Prezzo pellet (€/kg)"
+          "pellet_price_eur_kg": "Prezzo pellet (€/kg)",
+          "micronova_enabled": "Attiva integrazione Micronova AGUA IoT",
+          "micronova_host": "Indirizzo IP stufa (Micronova)"
+        }
+      },
+      "micronova": {
+        "title": "Impostazioni consumo Micronova",
+        "description": "Regola il consumo di pellet per livello di potenza della stufa.",
+        "data": {
+          "consumption_rate_1": "Consumo potenza 1 (kg/h)",
+          "consumption_rate_2": "Consumo potenza 2 (kg/h)",
+          "consumption_rate_3": "Consumo potenza 3 (kg/h)",
+          "consumption_rate_4": "Consumo potenza 4 (kg/h)",
+          "consumption_rate_5": "Consumo potenza 5 (kg/h)"
         }
       }
     }
   },
   "services": {
     "add_pellets": {
-      "name": "Aggiungi pellet",
-      "description": "Aggiungi sacchi di pellet al silo",
-      "fields": {
-        "bags": {
-          "name": "Sacchi",
-          "description": "Numero di sacchi da aggiungere"
-        }
-      }
+      "name": "Aggiungi pellet"
     },
     "set_silo_capacity": {
-      "name": "Imposta capacità silo",
-      "description": "Modifica la capacità massima del silo",
-      "fields": {
-        "bags": {
-          "name": "Capacità (sacchi)",
-          "description": "Nuova capacità in sacchi"
-        }
-      }
+      "name": "Imposta capacità silo"
     },
     "set_bag_weight": {
-      "name": "Imposta peso sacco",
-      "description": "Modifica il peso di un sacco di pellet",
-      "fields": {
-        "weight": {
-          "name": "Peso (kg)",
-          "description": "Nuovo peso in chilogrammi"
-        }
-      }
+      "name": "Imposta peso sacco"
     },
     "set_pellet_price": {
-      "name": "Imposta prezzo pellet",
-      "description": "Modifica il prezzo al chilogrammo dei pellet",
-      "fields": {
-        "price": {
-          "name": "Prezzo (€/kg)",
-          "description": "Nuovo prezzo in EUR per kg"
-        }
-      }
+      "name": "Imposta prezzo pellet"
     },
     "reset_season": {
-      "name": "Reset stagione",
-      "description": "Resetta tutte le statistiche stagionali (costi, storico)"
+      "name": "Reset stagione"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "stove_status": {
+        "name": "Stato stufa",
+        "state": {
+          "off": "Spento",
+          "start": "Accensione",
+          "work": "Riscaldamento",
+          "wait_on": "In attesa",
+          "temp_ok": "Temperatura raggiunta",
+          "wait_time": "Standby timer",
+          "stop": "Arresto errore",
+          "sunout": "Modalità estate"
+        }
+      },
+      "stove_power_level": {
+        "name": "Livello potenza"
+      },
+      "stove_ambient_temp": {
+        "name": "Temperatura ambiente"
+      },
+      "stove_setpoint_temp": {
+        "name": "Temperatura impostata"
+      },
+      "stove_runtime_today": {
+        "name": "Tempo funzionamento oggi"
+      },
+      "estimated_consumption_stove": {
+        "name": "Consumo stimato (stufa)"
+      },
+      "stove_alarms": {
+        "name": "Allarmi stufa"
+      },
+      "stove_pellets_low": {
+        "name": "Pellets esauriti"
+      }
     }
   }
 }

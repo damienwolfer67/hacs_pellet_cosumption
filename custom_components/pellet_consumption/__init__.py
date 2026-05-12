@@ -1,20 +1,22 @@
 """Pellet Consumption Tracker integration."""
 
-import asyncio
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import Any
 
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_NAME, Platform
-from homeassistant.core import HomeAssistant, ServiceCall, callback
-from homeassistant.helpers import config_validation as cv, entity_registry as er
+from homeassistant.const import Platform
+from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.storage import Store
 
 from .const import (
-    AUTONOMY_DAYS_WINDOW,
+    CONF_CONSUMPTION_RATES,
+    CONF_MICRONOVA_ENABLED,
+    CONF_MICRONOVA_HOST,
     DEFAULT_BAG_WEIGHT_KG,
+    DEFAULT_CONSUMPTION_RATES,
     DEFAULT_PELLET_PRICE_EUR_KG,
     DEFAULT_SILO_CAPACITY_BAGS,
     DOMAIN,
@@ -26,6 +28,8 @@ from .const import (
     SERVICE_SET_BAG_WEIGHT,
     SERVICE_SET_PELLET_PRICE,
     SERVICE_SET_SILO_CAPACITY,
+    STORAGE_KEY,
+    STORAGE_VERSION,
     STORE_BAG_WEIGHT_KG,
     STORE_CURRENT_BAGS,
     STORE_DAILY_SNAPSHOTS,
@@ -34,11 +38,9 @@ from .const import (
     STORE_RECHARGE_HISTORY,
     STORE_SEASON_START_DATE,
     STORE_SILO_CAPACITY_BAGS,
-    STORAGE_KEY,
-    STORAGE_VERSION,
 )
 
-PLATFORMS: Final = (Platform.SENSOR,)
+PLATFORMS = (Platform.SENSOR,)
 
 
 @dataclass
@@ -53,6 +55,9 @@ class PelletConsumptionData:
     season_start_date: str
     daily_snapshots: dict[str, dict[str, Any]]
     last_reset_date: str | None
+    micronova_enabled: bool = False
+    micronova_host: str | None = None
+    consumption_rates: dict[int, float] | None = None
 
 
 type PelletConsumptionConfigEntry = ConfigEntry[PelletConsumptionData]
@@ -83,6 +88,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: PelletConsumptionConfigE
         "pellet_price_eur_kg",
         stored_data.get(STORE_PELLET_PRICE_EUR_KG, DEFAULT_PELLET_PRICE_EUR_KG),
     )
+    micronova_enabled = options.get(CONF_MICRONOVA_ENABLED, False)
+    micronova_host = options.get(CONF_MICRONOVA_HOST)
+    consumption_rates = options.get(CONF_CONSUMPTION_RATES, DEFAULT_CONSUMPTION_RATES)
 
     # Initialize data
     data = PelletConsumptionData(
@@ -94,6 +102,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: PelletConsumptionConfigE
         season_start_date=stored_data.get(STORE_SEASON_START_DATE, date.today().isoformat()),
         daily_snapshots=stored_data.get(STORE_DAILY_SNAPSHOTS, {}),
         last_reset_date=stored_data.get(STORE_LAST_RESET_DATE),
+        micronova_enabled=micronova_enabled,
+        micronova_host=micronova_host,
+        consumption_rates=consumption_rates,
     )
 
     entry.runtime_data = data
@@ -103,19 +114,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: PelletConsumptionConfigE
         "store": store,
         "data": data,
         "entry": entry,
+        "entry_data": options,  # Store merged data for coordinator
     }
 
     # Set up platforms
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     # Register services
-    _async_register_services(hass, store, entry)
+    _async_register_services(hass, entry)
 
     # Create initial snapshot if needed
     await _async_create_daily_snapshot(hass, entry)
-
-    # Update unique_id for existing entries if needed
-    await _async_migrate_unique_ids(hass, entry)
 
     return True
 
@@ -143,7 +152,6 @@ async def async_migrate_entry(hass: HomeAssistant, entry: PelletConsumptionConfi
 
 def _async_register_services(
     hass: HomeAssistant,
-    store: Store,
     entry: PelletConsumptionConfigEntry,
 ) -> None:
     """Register the Pellet Consumption services."""
@@ -303,13 +311,9 @@ async def _async_save_data(hass: HomeAssistant, entry: PelletConsumptionConfigEn
 
 async def _async_update_sensors(hass: HomeAssistant, entry: PelletConsumptionConfigEntry) -> None:
     """Trigger sensor updates."""
-    for entity_id in er.async_entries_for_config_entry(
-        er.async_get(hass), entry.entry_id
-    ):
-        if entity_id.domain == Platform.SENSOR:
-            hass.async_create_task(
-                hass.data[DOMAIN][entry.entry_id]["coordinator"].async_refresh()
-            )
+    # Refresh coordinator if it exists
+    if "coordinator" in hass.data[DOMAIN][entry.entry_id]:
+        hass.data[DOMAIN][entry.entry_id]["coordinator"].async_refresh()
 
 
 async def _async_create_daily_snapshot(hass: HomeAssistant, entry: PelletConsumptionConfigEntry) -> None:
@@ -359,13 +363,3 @@ async def async_middleware_update_snapshot(hass: HomeAssistant, entry_id: str) -
     }
 
     await _async_save_data(hass, entry)
-
-
-async def _async_migrate_unique_ids(hass: HomeAssistant, entry: PelletConsumptionConfigEntry) -> None:
-    """Migrate unique IDs for existing entities."""
-    # This is a placeholder for future migrations if needed
-    pass
-
-
-from typing import Final
-from datetime import timedelta

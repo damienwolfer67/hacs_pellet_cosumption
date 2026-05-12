@@ -1,0 +1,81 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Pelletverbruiks Tracker Configuratie",
+        "description": "Configureer uw pellet silo instellingen.",
+        "data": {
+          "silo_capacity_bags": "Silo capaciteit (aantal zakken)",
+          "bag_weight_kg": "Zakgewicht (kg)",
+          "pellet_price_eur_kg": "Pellet prijs (€/kg)",
+          "name": "Instantie naam (optioneel)"
+        }
+      }
+    },
+    "error": {
+      "unknown": "Onbekende fout"
+    },
+    "abort": {
+      "already_configured": "Deze instantie is al geconfigureerd"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opties wijzigen",
+        "description": "Pas uw pellet silo instellingen aan.",
+        "data": {
+          "silo_capacity_bags": "Silo capaciteit (aantal zakken)",
+          "bag_weight_kg": "Zakgewicht (kg)",
+          "pellet_price_eur_kg": "Pellet prijs (€/kg)"
+        }
+      }
+    }
+  },
+  "services": {
+    "add_pellets": {
+      "name": "Pellets toevoegen",
+      "description": "Pelletzakken toevoegen aan de silo",
+      "fields": {
+        "bags": {
+          "name": "Zakken",
+          "description": "Aantal toe te voegen zakken"
+        }
+      }
+    },
+    "set_silo_capacity": {
+      "name": "Silo capaciteit instellen",
+      "description": "Wijzig de maximale capaciteit van de silo",
+      "fields": {
+        "bags": {
+          "name": "Capaciteit (zakken)",
+          "description": "Nieuwe capaciteit in zakken"
+        }
+      }
+    },
+    "set_bag_weight": {
+      "name": "Zakgewicht instellen",
+      "description": "Wijzig het gewicht van één pelletzak",
+      "fields": {
+        "weight": {
+          "name": "Gewicht (kg)",
+          "description": "Nieuw gewicht in kilogram"
+        }
+      }
+    },
+    "set_pellet_price": {
+      "name": "Pellet prijs instellen",
+      "description": "Wijzig de prijs per kilogram pellets",
+      "fields": {
+        "price": {
+          "name": "Prijs (€/kg)",
+          "description": "Nieuwe prijs in EUR per kg"
+        }
+      }
+    },
+    "reset_season": {
+      "name": "Seizoen resetten",
+      "description": "Reset alle seizoensstatistieken (kosten, geschiedenis)"
+    }
+  }
+}

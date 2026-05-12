@@ -1,0 +1,81 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configurazione Tracker Consumo Pellet",
+        "description": "Configura le impostazioni del tuo silo pellet.",
+        "data": {
+          "silo_capacity_bags": "Capacità silo (numero di sacchi)",
+          "bag_weight_kg": "Peso sacco (kg)",
+          "pellet_price_eur_kg": "Prezzo pellet (€/kg)",
+          "name": "Nome istanza (opzionale)"
+        }
+      }
+    },
+    "error": {
+      "unknown": "Errore sconosciuto"
+    },
+    "abort": {
+      "already_configured": "Questa istanza è già configurata"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Modifica opzioni",
+        "description": "Regola le impostazioni del tuo silo pellet.",
+        "data": {
+          "silo_capacity_bags": "Capacità silo (numero di sacchi)",
+          "bag_weight_kg": "Peso sacco (kg)",
+          "pellet_price_eur_kg": "Prezzo pellet (€/kg)"
+        }
+      }
+    }
+  },
+  "services": {
+    "add_pellets": {
+      "name": "Aggiungi pellet",
+      "description": "Aggiungi sacchi di pellet al silo",
+      "fields": {
+        "bags": {
+          "name": "Sacchi",
+          "description": "Numero di sacchi da aggiungere"
+        }
+      }
+    },
+    "set_silo_capacity": {
+      "name": "Imposta capacità silo",
+      "description": "Modifica la capacità massima del silo",
+      "fields": {
+        "bags": {
+          "name": "Capacità (sacchi)",
+          "description": "Nuova capacità in sacchi"
+        }
+      }
+    },
+    "set_bag_weight": {
+      "name": "Imposta peso sacco",
+      "description": "Modifica il peso di un sacco di pellet",
+      "fields": {
+        "weight": {
+          "name": "Peso (kg)",
+          "description": "Nuovo peso in chilogrammi"
+        }
+      }
+    },
+    "set_pellet_price": {
+      "name": "Imposta prezzo pellet",
+      "description": "Modifica il prezzo al chilogrammo dei pellet",
+      "fields": {
+        "price": {
+          "name": "Prezzo (€/kg)",
+          "description": "Nuovo prezzo in EUR per kg"
+        }
+      }
+    },
+    "reset_season": {
+      "name": "Reset stagione",
+      "description": "Resetta tutte le statistiche stagionali (costi, storico)"
+    }
+  }
+}

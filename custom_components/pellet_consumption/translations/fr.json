@@ -8,12 +8,15 @@
           "silo_capacity_bags": "Capacité du silo (nombre de sacs)",
           "bag_weight_kg": "Poids d'un sac (kg)",
           "pellet_price_eur_kg": "Prix des pellets (€/kg)",
-          "name": "Nom de l'instance (optionnel)"
+          "name": "Nom de l'instance (optionnel)",
+          "micronova_enabled": "Activer l'intégration Micronova AGUA IoT",
+          "micronova_host": "Adresse IP du poêle (Micronova)"
         }
       }
     },
     "error": {
-      "unknown": "Erreur inconnue"
+      "unknown": "Erreur inconnue",
+      "cannot_connect": "Impossible de connecter au poêle Micronova. Vérifiez l'adresse IP."
     },
     "abort": {
       "already_configured": "Cette instance est déjà configurée"
@@ -27,7 +30,20 @@
         "data": {
           "silo_capacity_bags": "Capacité du silo (nombre de sacs)",
           "bag_weight_kg": "Poids d'un sac (kg)",
-          "pellet_price_eur_kg": "Prix des pellets (€/kg)"
+          "pellet_price_eur_kg": "Prix des pellets (€/kg)",
+          "micronova_enabled": "Activer l'intégration Micronova AGUA IoT",
+          "micronova_host": "Adresse IP du poêle (Micronova)"
+        }
+      },
+      "micronova": {
+        "title": "Paramètres de consommation Micronova",
+        "description": "Ajustez la consommation de pellets par niveau de puissance du poêle.",
+        "data": {
+          "consumption_rate_1": "Consommation puissance 1 (kg/h)",
+          "consumption_rate_2": "Consommation puissance 2 (kg/h)",
+          "consumption_rate_3": "Consommation puissance 3 (kg/h)",
+          "consumption_rate_4": "Consommation puissance 4 (kg/h)",
+          "consumption_rate_5": "Consommation puissance 5 (kg/h)"
         }
       }
     }
@@ -76,6 +92,44 @@
     "reset_season": {
       "name": "Réinitialiser la saison",
       "description": "Réinitialise toutes les statistiques de la saison (coût, historique)"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "stove_status": {
+        "name": "État du poêle",
+        "state": {
+          "off": "Arrêt",
+          "start": "Allumage",
+          "work": "Chauffe",
+          "wait_on": "En attente",
+          "temp_ok": "Température atteinte",
+          "wait_time": "Veille programmée",
+          "stop": "Arrêt erreur",
+          "sunout": "Mode été"
+        }
+      },
+      "stove_power_level": {
+        "name": "Niveau de puissance"
+      },
+      "stove_ambient_temp": {
+        "name": "Température ambiante"
+      },
+      "stove_setpoint_temp": {
+        "name": "Température de consigne"
+      },
+      "stove_runtime_today": {
+        "name": "Temps de fonctionnement aujourd'hui"
+      },
+      "estimated_consumption_stove": {
+        "name": "Consommation estimée (poêle)"
+      },
+      "stove_alarms": {
+        "name": "Alarmes du poêle"
+      },
+      "stove_pellets_low": {
+        "name": "Pellets bas"
+      }
     }
   }
 }

@@ -8,12 +8,15 @@
           "silo_capacity_bags": "Silo capacity (number of bags)",
           "bag_weight_kg": "Bag weight (kg)",
           "pellet_price_eur_kg": "Pellet price (€/kg)",
-          "name": "Instance name (optional)"
+          "name": "Instance name (optional)",
+          "micronova_enabled": "Enable Micronova AGUA IoT integration",
+          "micronova_host": "Stove IP address (Micronova)"
         }
       }
     },
     "error": {
-      "unknown": "Unknown error"
+      "unknown": "Unknown error",
+      "cannot_connect": "Cannot connect to Micronova stove. Check the IP address."
     },
     "abort": {
       "already_configured": "This instance is already configured"
@@ -27,7 +30,20 @@
         "data": {
           "silo_capacity_bags": "Silo capacity (number of bags)",
           "bag_weight_kg": "Bag weight (kg)",
-          "pellet_price_eur_kg": "Pellet price (€/kg)"
+          "pellet_price_eur_kg": "Pellet price (€/kg)",
+          "micronova_enabled": "Enable Micronova AGUA IoT integration",
+          "micronova_host": "Stove IP address (Micronova)"
+        }
+      },
+      "micronova": {
+        "title": "Micronova consumption settings",
+        "description": "Adjust pellet consumption per stove power level.",
+        "data": {
+          "consumption_rate_1": "Power 1 consumption (kg/h)",
+          "consumption_rate_2": "Power 2 consumption (kg/h)",
+          "consumption_rate_3": "Power 3 consumption (kg/h)",
+          "consumption_rate_4": "Power 4 consumption (kg/h)",
+          "consumption_rate_5": "Power 5 consumption (kg/h)"
         }
       }
     }
@@ -76,6 +92,44 @@
     "reset_season": {
       "name": "Reset season",
       "description": "Reset all seasonal statistics (cost, history)"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "stove_status": {
+        "name": "Stove status",
+        "state": {
+          "off": "Off",
+          "start": "Igniting",
+          "work": "Heating",
+          "wait_on": "Waiting",
+          "temp_ok": "Temperature reached",
+          "wait_time": "Standby timer",
+          "stop": "Error stop",
+          "sunout": "Summer mode"
+        }
+      },
+      "stove_power_level": {
+        "name": "Power level"
+      },
+      "stove_ambient_temp": {
+        "name": "Ambient temperature"
+      },
+      "stove_setpoint_temp": {
+        "name": "Setpoint temperature"
+      },
+      "stove_runtime_today": {
+        "name": "Runtime today"
+      },
+      "estimated_consumption_stove": {
+        "name": "Estimated consumption (stove)"
+      },
+      "stove_alarms": {
+        "name": "Stove alarms"
+      },
+      "stove_pellets_low": {
+        "name": "Pellets low"
+      }
     }
   }
 }

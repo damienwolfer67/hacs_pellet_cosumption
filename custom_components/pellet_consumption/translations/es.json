@@ -8,12 +8,15 @@
           "silo_capacity_bags": "Capacidad del silo (número de sacos)",
           "bag_weight_kg": "Peso del saco (kg)",
           "pellet_price_eur_kg": "Precio de pellets (€/kg)",
-          "name": "Nombre de instancia (opcional)"
+          "name": "Nombre de instancia (opcional)",
+          "micronova_enabled": "Activar integración Micronova AGUA IoT",
+          "micronova_host": "Dirección IP del estufa (Micronova)"
         }
       }
     },
     "error": {
-      "unknown": "Error desconocido"
+      "unknown": "Error desconocido",
+      "cannot_connect": "No se puede conectar a la estufa Micronova. Verifique la dirección IP."
     },
     "abort": {
       "already_configured": "Esta instancia ya está configurada"
@@ -27,55 +30,77 @@
         "data": {
           "silo_capacity_bags": "Capacidad del silo (número de sacos)",
           "bag_weight_kg": "Peso del saco (kg)",
-          "pellet_price_eur_kg": "Precio de pellets (€/kg)"
+          "pellet_price_eur_kg": "Precio de pellets (€/kg)",
+          "micronova_enabled": "Activar integración Micronova AGUA IoT",
+          "micronova_host": "Dirección IP del estufa (Micronova)"
+        }
+      },
+      "micronova": {
+        "title": "Ajustes de consumo Micronova",
+        "description": "Ajuste el consumo de pellets por nivel de potencia de la estufa.",
+        "data": {
+          "consumption_rate_1": "Consumo potencia 1 (kg/h)",
+          "consumption_rate_2": "Consumo potencia 2 (kg/h)",
+          "consumption_rate_3": "Consumo potencia 3 (kg/h)",
+          "consumption_rate_4": "Consumo potencia 4 (kg/h)",
+          "consumption_rate_5": "Consumo potencia 5 (kg/h)"
         }
       }
     }
   },
   "services": {
     "add_pellets": {
-      "name": "Añadir pellets",
-      "description": "Añade sacos de pellets al silo",
-      "fields": {
-        "bags": {
-          "name": "Sacos",
-          "description": "Número de sacos a añadir"
-        }
-      }
+      "name": "Añadir pellets"
     },
     "set_silo_capacity": {
-      "name": "Establecer capacidad del silo",
-      "description": "Cambia la capacidad máxima del silo",
-      "fields": {
-        "bags": {
-          "name": "Capacidad (sacos)",
-          "description": "Nueva capacidad en sacos"
-        }
-      }
+      "name": "Establecer capacidad del silo"
     },
     "set_bag_weight": {
-      "name": "Establecer peso del saco",
-      "description": "Cambia el peso de un saco de pellets",
-      "fields": {
-        "weight": {
-          "name": "Peso (kg)",
-          "description": "Nuevo peso en kilogramos"
-        }
-      }
+      "name": "Establecer peso del saco"
     },
     "set_pellet_price": {
-      "name": "Establecer precio de pellets",
-      "description": "Cambia el precio por kilogramo de pellets",
-      "fields": {
-        "price": {
-          "name": "Precio (€/kg)",
-          "description": "Nuevo precio en EUR por kg"
-        }
-      }
+      "name": "Establecer precio de pellets"
     },
     "reset_season": {
-      "name": "Reiniciar temporada",
-      "description": "Restablece todas las estadísticas de la temporada (costos, historial)"
+      "name": "Reiniciar temporada"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "stove_status": {
+        "name": "Estado de la estufa",
+        "state": {
+          "off": "Apagado",
+          "start": "Encendiendo",
+          "work": "Calentando",
+          "wait_on": "Esperando",
+          "temp_ok": "Temperatura alcanzada",
+          "wait_time": "Espera programada",
+          "stop": "Parada error",
+          "sunout": "Modo verano"
+        }
+      },
+      "stove_power_level": {
+        "name": "Nivel de potencia"
+      },
+      "stove_ambient_temp": {
+        "name": "Temperatura ambiente"
+      },
+      "stove_setpoint_temp": {
+        "name": "Temperatura objetivo"
+      },
+      "stove_runtime_today": {
+        "name": "Tiempo de funcionamiento hoy"
+      },
+      "estimated_consumption_stove": {
+        "name": "Consumo estimado (estufa)"
+      },
+      "stove_alarms": {
+        "name": "Alarmas de la estufa"
+      },
+      "stove_pellets_low": {
+        "name": "Pellets bajos"
+      }
     }
   }
 }

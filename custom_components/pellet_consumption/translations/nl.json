@@ -8,12 +8,15 @@
           "silo_capacity_bags": "Silo capaciteit (aantal zakken)",
           "bag_weight_kg": "Zakgewicht (kg)",
           "pellet_price_eur_kg": "Pellet prijs (€/kg)",
-          "name": "Instantie naam (optioneel)"
+          "name": "Instantie naam (optioneel)",
+          "micronova_enabled": "Micronova AGUA IoT integratie inschakelen",
+          "micronova_host": "Kachel IP-adres (Micronova)"
         }
       }
     },
     "error": {
-      "unknown": "Onbekende fout"
+      "unknown": "Onbekende fout",
+      "cannot_connect": "Kan geen verbinding maken met Micronova kachel. Controleer het IP-adres."
     },
     "abort": {
       "already_configured": "Deze instantie is al geconfigureerd"
@@ -27,55 +30,77 @@
         "data": {
           "silo_capacity_bags": "Silo capaciteit (aantal zakken)",
           "bag_weight_kg": "Zakgewicht (kg)",
-          "pellet_price_eur_kg": "Pellet prijs (€/kg)"
+          "pellet_price_eur_kg": "Pellet prijs (€/kg)",
+          "micronova_enabled": "Micronova AGUA IoT integratie inschakelen",
+          "micronova_host": "Kachel IP-adres (Micronova)"
+        }
+      },
+      "micronova": {
+        "title": "Micronova verbruiksinstellingen",
+        "description": "Pas pelletverbruik aan per kachel vermogensniveau.",
+        "data": {
+          "consumption_rate_1": "Vermogen 1 verbruik (kg/h)",
+          "consumption_rate_2": "Vermogen 2 verbruik (kg/h)",
+          "consumption_rate_3": "Vermogen 3 verbruik (kg/h)",
+          "consumption_rate_4": "Vermogen 4 verbruik (kg/h)",
+          "consumption_rate_5": "Vermogen 5 verbruik (kg/h)"
         }
       }
     }
   },
   "services": {
     "add_pellets": {
-      "name": "Pellets toevoegen",
-      "description": "Pelletzakken toevoegen aan de silo",
-      "fields": {
-        "bags": {
-          "name": "Zakken",
-          "description": "Aantal toe te voegen zakken"
-        }
-      }
+      "name": "Pellets toevoegen"
     },
     "set_silo_capacity": {
-      "name": "Silo capaciteit instellen",
-      "description": "Wijzig de maximale capaciteit van de silo",
-      "fields": {
-        "bags": {
-          "name": "Capaciteit (zakken)",
-          "description": "Nieuwe capaciteit in zakken"
-        }
-      }
+      "name": "Silo capaciteit instellen"
     },
     "set_bag_weight": {
-      "name": "Zakgewicht instellen",
-      "description": "Wijzig het gewicht van één pelletzak",
-      "fields": {
-        "weight": {
-          "name": "Gewicht (kg)",
-          "description": "Nieuw gewicht in kilogram"
-        }
-      }
+      "name": "Zakgewicht instellen"
     },
     "set_pellet_price": {
-      "name": "Pellet prijs instellen",
-      "description": "Wijzig de prijs per kilogram pellets",
-      "fields": {
-        "price": {
-          "name": "Prijs (€/kg)",
-          "description": "Nieuwe prijs in EUR per kg"
-        }
-      }
+      "name": "Pellet prijs instellen"
     },
     "reset_season": {
-      "name": "Seizoen resetten",
-      "description": "Reset alle seizoensstatistieken (kosten, geschiedenis)"
+      "name": "Seizoen resetten"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "stove_status": {
+        "name": "Kachel status",
+        "state": {
+          "off": "Uit",
+          "start": "Ontsteken",
+          "work": "Verwarmt",
+          "wait_on": "Wachtend",
+          "temp_ok": "Temperatuur bereikt",
+          "wait_time": "Standby timer",
+          "stop": "Fout stop",
+          "sunout": "Zomer modus"
+        }
+      },
+      "stove_power_level": {
+        "name": "Vermogensniveau"
+      },
+      "stove_ambient_temp": {
+        "name": "Kamertemperatuur"
+      },
+      "stove_setpoint_temp": {
+        "name": "Insteltemperatuur"
+      },
+      "stove_runtime_today": {
+        "name": "Looptijd vandaag"
+      },
+      "estimated_consumption_stove": {
+        "name": "Geschat verbruik (kachel)"
+      },
+      "stove_alarms": {
+        "name": "Kachel alarmen"
+      },
+      "stove_pellets_low": {
+        "name": "Pellets bijna leeg"
+      }
     }
   }
 }

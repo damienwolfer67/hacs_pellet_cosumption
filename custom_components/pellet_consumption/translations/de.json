@@ -8,12 +8,15 @@
           "silo_capacity_bags": "Lagerkapazität (Anzahl Säcke)",
           "bag_weight_kg": "Sackgewicht (kg)",
           "pellet_price_eur_kg": "Pelletpreis (€/kg)",
-          "name": "Instanzname (optional)"
+          "name": "Instanzname (optional)",
+          "micronova_enabled": "Micronova AGUA IoT Integration aktivieren",
+          "micronova_host": "Ofen IP-Adresse (Micronova)"
         }
       }
     },
     "error": {
-      "unknown": "Unbekannter Fehler"
+      "unknown": "Unbekannter Fehler",
+      "cannot_connect": "Keine Verbindung zum Micronova Ofen. IP-Adresse überprüfen."
     },
     "abort": {
       "already_configured": "Diese Instanz ist bereits konfiguriert"
@@ -27,7 +30,20 @@
         "data": {
           "silo_capacity_bags": "Lagerkapazität (Anzahl Säcke)",
           "bag_weight_kg": "Sackgewicht (kg)",
-          "pellet_price_eur_kg": "Pelletpreis (€/kg)"
+          "pellet_price_eur_kg": "Pelletpreis (€/kg)",
+          "micronova_enabled": "Micronova AGUA IoT Integration aktivieren",
+          "micronova_host": "Ofen IP-Adresse (Micronova)"
+        }
+      },
+      "micronova": {
+        "title": "Micronova Verbrauchseinstellungen",
+        "description": "Pelletverbrauch pro Ofenleistungsstufe anpassen.",
+        "data": {
+          "consumption_rate_1": "Leistung 1 Verbrauch (kg/h)",
+          "consumption_rate_2": "Leistung 2 Verbrauch (kg/h)",
+          "consumption_rate_3": "Leistung 3 Verbrauch (kg/h)",
+          "consumption_rate_4": "Leistung 4 Verbrauch (kg/h)",
+          "consumption_rate_5": "Leistung 5 Verbrauch (kg/h)"
         }
       }
     }
@@ -35,7 +51,6 @@
   "services": {
     "add_pellets": {
       "name": "Pellets hinzufügen",
-      "description": "Pelletsäcke zum Lager hinzufügen",
       "fields": {
         "bags": {
           "name": "Säcke",
@@ -45,37 +60,68 @@
     },
     "set_silo_capacity": {
       "name": "Lagerkapazität festlegen",
-      "description": "Ändert die maximale Kapazität des Lagers",
       "fields": {
         "bags": {
-          "name": "Kapazität (Säcke)",
-          "description": "Neue Kapazität in Säcken"
+          "name": "Kapazität (Säcke)"
         }
       }
     },
     "set_bag_weight": {
       "name": "Sackgewicht festlegen",
-      "description": "Ändert das Gewicht eines Pelletsacks",
       "fields": {
         "weight": {
-          "name": "Gewicht (kg)",
-          "description": "Neues Gewicht in Kilogramm"
+          "name": "Gewicht (kg)"
         }
       }
     },
     "set_pellet_price": {
       "name": "Pelletpreis festlegen",
-      "description": "Ändert den Preis pro Kilogramm Pellets",
       "fields": {
         "price": {
-          "name": "Preis (€/kg)",
-          "description": "Neuer Preis in EUR pro kg"
+          "name": "Preis (€/kg)"
         }
       }
     },
     "reset_season": {
-      "name": "Saison zurücksetzen",
-      "description": "Setzt alle Saisonstatistiken zurück (Kosten, Verlauf)"
+      "name": "Saison zurücksetzen"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "stove_status": {
+        "name": "Ofenstatus",
+        "state": {
+          "off": "Aus",
+          "start": "Zündet",
+          "work": "Heizt",
+          "wait_on": "Wartend",
+          "temp_ok": "Temperatur erreicht",
+          "wait_time": "Standby Timer",
+          "stop": "Fehlerstopp",
+          "sunout": "Sommermodus"
+        }
+      },
+      "stove_power_level": {
+        "name": "Leistungsstufe"
+      },
+      "stove_ambient_temp": {
+        "name": "Raumtemperatur"
+      },
+      "stove_setpoint_temp": {
+        "name": "Solltemperatur"
+      },
+      "stove_runtime_today": {
+        "name": "Laufzeit heute"
+      },
+      "estimated_consumption_stove": {
+        "name": "Geschätzter Verbrauch (Ofen)"
+      },
+      "stove_alarms": {
+        "name": "Ofenalarme"
+      },
+      "stove_pellets_low": {
+        "name": "Pellets leer"
+      }
     }
   }
 }

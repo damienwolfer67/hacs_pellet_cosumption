@@ -1,16 +1,25 @@
 """Sensor platform for Pellet Consumption Tracker integration."""
 
+import asyncio
+import logging
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
+from typing import Any
 
 from homeassistant.components.sensor import (
+    SensorDeviceClass,
     SensorEntity,
     SensorEntityDescription,
     SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import PERCENTAGE, UnitOfMass, UnitOfVolume
+from homeassistant.const import (
+    PERCENTAGE,
+    UnitOfMass,
+    UnitOfTemperature,
+    UnitOfTime,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -19,19 +28,41 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import (
     AUTONOMY_DAYS_WINDOW,
+    CONF_CONSUMPTION_RATES,
+    CONF_MICRONOVA_ENABLED,
+    CONF_MICRONOVA_HOST,
+    DEFAULT_BAG_WEIGHT_KG,
+    DEFAULT_CONSUMPTION_RATES,
+    DEFAULT_PELLET_PRICE_EUR_KG,
+    DEFAULT_SILO_CAPACITY_BAGS,
     DOMAIN,
+    ICON_ALERT,
     ICON_BAG,
     ICON_CALENDAR,
+    ICON_CLOCK_ALERT,
     ICON_EURO,
     ICON_PERCENTAGE,
     ICON_PELLET,
+    ICON_POWER,
     ICON_SILO,
+    ICON_STOVE,
+    ICON_THERMOMETER,
+    ICON_THERMOMETER_LOW,
+    MICRONOVA_STATUS_NAMES,
     SENSOR_DAILY_CONSUMPTION_BAGS,
     SENSOR_DAILY_CONSUMPTION_KG,
     SENSOR_ESTIMATED_AUTONOMY_DAYS,
+    SENSOR_ESTIMATED_CONSUMPTION_STOVE,
     SENSOR_REMAINING_BAGS,
     SENSOR_REMAINING_KG,
     SENSOR_REMAINING_PERCENTAGE,
+    SENSOR_STOVE_ALARMS,
+    SENSOR_STOVE_AMBIENT_TEMP,
+    SENSOR_STOVE_PELLETS_LOW,
+    SENSOR_STOVE_POWER_LEVEL,
+    SENSOR_STOVE_RUNTIME_TODAY,
+    SENSOR_STOVE_SETPOINT_TEMP,
+    SENSOR_STOVE_STATUS,
     SENSOR_TOTAL_COST_SEASON,
     STORE_BAG_WEIGHT_KG,
     STORE_CURRENT_BAGS,
@@ -43,15 +74,18 @@ from .const import (
     STORE_SILO_CAPACITY_BAGS,
 )
 
+_LOGGER = logging.getLogger(__name__)
+
 
 @dataclass(frozen=True, kw_only=True)
 class PelletSensorEntityDescription(SensorEntityDescription):
     """Describes Pellet Consumption sensor entity."""
 
-    value_fn: Callable[[dict], float | int | None] | None = None
+    value_fn: Callable[[dict], float | int | str | None] | None = None
 
 
-SENSOR_DESCRIPTIONS: tuple[PelletSensorEntityDescription, ...] = (
+# Base sensors (always available)
+BASE_SENSOR_DESCRIPTIONS: tuple[PelletSensorEntityDescription, ...] = (
     PelletSensorEntityDescription(
         key=SENSOR_DAILY_CONSUMPTION_BAGS,
         name="Daily Consumption (bags)",
@@ -110,6 +144,77 @@ SENSOR_DESCRIPTIONS: tuple[PelletSensorEntityDescription, ...] = (
     ),
 )
 
+# Micronova stove sensors (only when enabled)
+MICRONOVA_SENSOR_DESCRIPTIONS: tuple[PelletSensorEntityDescription, ...] = (
+    PelletSensorEntityDescription(
+        key=SENSOR_STOVE_STATUS,
+        name="Stove Status",
+        icon=ICON_STOVE,
+        device_class=SensorDeviceClass.ENUM,
+        options=list(MICRONOVA_STATUS_NAMES.values()),
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+    PelletSensorEntityDescription(
+        key=SENSOR_STOVE_POWER_LEVEL,
+        name="Stove Power Level",
+        icon=ICON_POWER,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement="level",
+        suggested_display_precision=0,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+    PelletSensorEntityDescription(
+        key=SENSOR_STOVE_AMBIENT_TEMP,
+        name="Stove Ambient Temperature",
+        icon=ICON_THERMOMETER,
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        suggested_display_precision=1,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+    PelletSensorEntityDescription(
+        key=SENSOR_STOVE_SETPOINT_TEMP,
+        name="Stove Setpoint Temperature",
+        icon=ICON_THERMOMETER_LOW,
+        device_class=SensorDeviceClass.TEMPERATURE,
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        suggested_display_precision=1,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+    PelletSensorEntityDescription(
+        key=SENSOR_STOVE_RUNTIME_TODAY,
+        name="Stove Runtime Today",
+        icon=ICON_CLOCK_ALERT,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfTime.HOURS,
+        suggested_display_precision=1,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+    PelletSensorEntityDescription(
+        key=SENSOR_ESTIMATED_CONSUMPTION_STOVE,
+        name="Estimated Consumption (stove)",
+        icon=ICON_PELLET,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        native_unit_of_measurement=UnitOfMass.KILOGRAM,
+        suggested_display_precision=1,
+    ),
+    PelletSensorEntityDescription(
+        key=SENSOR_STOVE_ALARMS,
+        name="Stove Alarms",
+        icon=ICON_ALERT,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+    PelletSensorEntityDescription(
+        key=SENSOR_STOVE_PELLETS_LOW,
+        name="Stove Pellets Low",
+        icon=ICON_ALERT,
+        device_class=SensorDeviceClass.PROBLEM,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+)
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -117,7 +222,19 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the sensor platform."""
-    coordinator: PelletConsumptionCoordinator = hass.data[DOMAIN][entry.entry_id]
+    # Get or create coordinator
+    if "coordinator" not in hass.data[DOMAIN][entry.entry_id]:
+        # Create coordinator
+        coordinator = PelletConsumptionCoordinator(
+            hass=hass,
+            entry_id=entry.entry_id,
+            entry_data=hass.data[DOMAIN][entry.entry_id]["entry_data"],
+            store_data=lambda: hass.data[DOMAIN][entry.entry_id]["data"],
+            save_data=lambda data: hass.data[DOMAIN][entry.entry_id].update({"data": data}),
+        )
+        hass.data[DOMAIN][entry.entry_id]["coordinator"] = coordinator
+
+    coordinator: PelletConsumptionCoordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
 
     entities = [
         PelletConsumptionSensor(
@@ -125,8 +242,21 @@ async def async_setup_entry(
             description=description,
             entry_id=entry.entry_id,
         )
-        for description in SENSOR_DESCRIPTIONS
+        for description in BASE_SENSOR_DESCRIPTIONS
     ]
+
+    # Add Micronova sensors if enabled
+    if coordinator.micronova_enabled:
+        entities.extend(
+            [
+                PelletConsumptionSensor(
+                    coordinator=coordinator,
+                    description=description,
+                    entry_id=entry.entry_id,
+                )
+                for description in MICRONOVA_SENSOR_DESCRIPTIONS
+            ]
+        )
 
     async_add_entities(entities)
 
@@ -139,7 +269,7 @@ class PelletConsumptionSensor(SensorEntity):
 
     def __init__(
         self,
-        coordinator: PelletConsumptionCoordinator,
+        coordinator: "PelletConsumptionCoordinator",
         description: PelletSensorEntityDescription,
         entry_id: str,
     ) -> None:
@@ -150,7 +280,7 @@ class PelletConsumptionSensor(SensorEntity):
         self._attr_device_info = coordinator.device_info
 
     @property
-    def native_value(self) -> float | int | None:
+    def native_value(self) -> float | int | str | None:
         """Return the state of the sensor."""
         data = self.coordinator.data
         key = self.entity_description.key
@@ -169,30 +299,75 @@ class PelletConsumptionSensor(SensorEntity):
             return data.get("estimated_autonomy_days")
         elif key == SENSOR_TOTAL_COST_SEASON:
             return data.get("total_cost_season")
+        elif key == SENSOR_STOVE_STATUS:
+            return data.get("stove_status")
+        elif key == SENSOR_STOVE_POWER_LEVEL:
+            return data.get("stove_power_level")
+        elif key == SENSOR_STOVE_AMBIENT_TEMP:
+            return data.get("stove_ambient_temp")
+        elif key == SENSOR_STOVE_SETPOINT_TEMP:
+            return data.get("stove_setpoint_temp")
+        elif key == SENSOR_STOVE_RUNTIME_TODAY:
+            return data.get("stove_runtime_today")
+        elif key == SENSOR_ESTIMATED_CONSUMPTION_STOVE:
+            return data.get("estimated_consumption_stove")
+        elif key == SENSOR_STOVE_ALARMS:
+            alarms = data.get("stove_alarms", [])
+            return ",".join(alarms) if alarms else "OK"
+        elif key == SENSOR_STOVE_PELLETS_LOW:
+            return data.get("stove_pellets_low")
 
         return None
+
+    @property
+    def available(self) -> bool:
+        """Return if entity is available."""
+        # Micronova sensors require connection to be available
+        if self.entity_description.key in [d.key for d in MICRONOVA_SENSOR_DESCRIPTIONS]:
+            return self.coordinator.micronova_connected
+        return True
 
 
 class PelletConsumptionCoordinator(DataUpdateCoordinator):
     """Coordinator to manage data updates."""
 
-    def __init__(self, hass: HomeAssistant, entry_id: str, store_data: Callable[[], dict]) -> None:
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        entry_id: str,
+        entry_data: dict[str, Any],
+        store_data: Callable[[], dict],
+        save_data: Callable[[dict], Any],
+    ) -> None:
         """Initialize the coordinator."""
         super().__init__(
             hass,
             _LOGGER,
             name="Pellet Consumption",
-            update_interval=timedelta(minutes=15),
+            update_interval=timedelta(minutes=1),  # More frequent for Micronova
         )
         self.entry_id = entry_id
+        self.entry_data = entry_data
         self._store_data = store_data
+        self._save_data = save_data
+
+        # Micronova settings
+        self.micronova_enabled = entry_data.get(CONF_MICRONOVA_ENABLED, False)
+        self.micronova_host = entry_data.get(CONF_MICRONOVA_HOST)
+        self.consumption_rates = entry_data.get(CONF_CONSUMPTION_RATES, DEFAULT_CONSUMPTION_RATES)
+        self.micronova_connected = False
+        self._micronova_connection = None
+
+        # Runtime tracking for today
+        self._runtime_samples: list[tuple[int, int]] = []  # (timestamp, power_level)
+        self._today_date = date.today()
 
         # Device info for all entities
         self.device_info = {
             "identifiers": {(DOMAIN, entry_id)},
             "name": "Pellet Consumption Tracker",
             "manufacturer": "@damienwolfer67",
-            "model": "Pellet Tracker",
+            "model": "Pellet Tracker" + (" + Micronova" if self.micronova_enabled else ""),
         }
 
         # Track midnight for daily reset
@@ -206,18 +381,34 @@ class PelletConsumptionCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self) -> dict:
         """Update sensor data."""
-        data = self._store_data()
+        data = await self._update_base_data()
 
-        silo_capacity = data.get(STORE_SILO_CAPACITY_BAGS, DEFAULT_SILO_CAPACITY_BAGS)
-        current_bags = data.get(STORE_CURRENT_BAGS, silo_capacity)
-        bag_weight = data.get(STORE_BAG_WEIGHT_KG, DEFAULT_BAG_WEIGHT_KG)
-        pellet_price = data.get(STORE_PELLET_PRICE_EUR_KG, DEFAULT_PELLET_PRICE_EUR_KG)
-        daily_snapshots = data.get(STORE_DAILY_SNAPSHOTS, {})
-        recharge_history = data.get(STORE_RECHARGE_HISTORY, [])
-        season_start = data.get(STORE_SEASON_START_DATE, date.today().isoformat())
-        last_reset = data.get(STORE_LAST_RESET_DATE)
+        # Update Micronova data if enabled
+        if self.micronova_enabled and self.micronova_host:
+            micronova_data = await self._update_micronova_data()
+            data.update(micronova_data)
+
+        return data
+
+    async def _update_base_data(self) -> dict:
+        """Update base sensor data (manual tracking)."""
+        stored_data = self._store_data()
+
+        silo_capacity = stored_data.get(STORE_SILO_CAPACITY_BAGS, DEFAULT_SILO_CAPACITY_BAGS)
+        current_bags = stored_data.get(STORE_CURRENT_BAGS, silo_capacity)
+        bag_weight = stored_data.get(STORE_BAG_WEIGHT_KG, DEFAULT_BAG_WEIGHT_KG)
+        pellet_price = stored_data.get(STORE_PELLET_PRICE_EUR_KG, DEFAULT_PELLET_PRICE_EUR_KG)
+        daily_snapshots = stored_data.get(STORE_DAILY_SNAPSHOTS, {})
+        recharge_history = stored_data.get(STORE_RECHARGE_HISTORY, [])
+        season_start = stored_data.get(STORE_SEASON_START_DATE, date.today().isoformat())
+        last_reset = stored_data.get(STORE_LAST_RESET_DATE)
 
         today = date.today().isoformat()
+
+        # Reset runtime samples on new day
+        if self._today_date != date.today():
+            self._runtime_samples = []
+            self._today_date = date.today()
 
         # Calculate remaining
         remaining_bags = current_bags
@@ -274,22 +465,95 @@ class PelletConsumptionCoordinator(DataUpdateCoordinator):
             "total_cost_season": round(total_cost_season, 2),
         }
 
+    async def _update_micronova_data(self) -> dict:
+        """Update Micronova stove data."""
+        from . import micronova
+
+        data: dict[str, Any] = {}
+
+        # Create connection if needed
+        if self._micronova_connection is None:
+            try:
+                self._micronova_connection = await micronova.create_micronova_connection(
+                    self.hass, self.micronova_host
+                )
+            except Exception as err:
+                _LOGGER.warning("Failed to connect to Micronova: %s", err)
+                self.micronova_connected = False
+                return self._get_micronova_offline_data()
+
+        try:
+            # Get stove state
+            stove_state = await self._micronova_connection.get_stove_state()
+            self.micronova_connected = True
+
+            # Store samples for consumption calculation
+            timestamp = int(self.hass.loop.time())
+            self._runtime_samples.append((timestamp, stove_state.power_level))
+
+            # Keep only last 24 hours of samples (86400 seconds)
+            cutoff = timestamp - 86400
+            self._runtime_samples = [(t, p) for t, p in self._runtime_samples if t > cutoff]
+
+            data.update({
+                "stove_status": stove_state.status,
+                "stove_power_level": stove_state.power_level,
+                "stove_ambient_temp": stove_state.ambient_temp,
+                "stove_setpoint_temp": stove_state.setpoint_temp,
+                "stove_alarms": stove_state.alarms,
+                "stove_pellets_low": stove_state.pellets_low,
+            })
+
+            # Calculate runtime today
+            today_start = int(datetime.combine(date.today(), datetime.min.time()).timestamp())
+            today_samples = [(t, p) for t, p in self._runtime_samples if t >= today_start]
+
+            runtime_today = 0.0
+            if len(today_samples) > 1:
+                for i in range(len(today_samples) - 1):
+                    duration = today_samples[i + 1][0] - today_samples[i][0]
+                    if today_samples[i][1] > 0:  # Stove was on
+                        runtime_today += duration
+
+            data["stove_runtime_today"] = round(runtime_today / 3600, 1)  # Convert to hours
+
+            # Calculate estimated consumption from stove
+            data["estimated_consumption_stove"] = round(
+                micronova.estimate_daily_consumption_from_samples(
+                    today_samples, self.consumption_rates
+                ),
+                1,
+            )
+
+        except Exception as err:
+            _LOGGER.warning("Error reading Micronova data: %s", err)
+            self.micronova_connected = False
+            return self._get_micronova_offline_data()
+
+        return data
+
+    def _get_micronova_offline_data(self) -> dict:
+        """Return offline/unknown state for Micronova sensors."""
+        return {
+            "stove_status": "unknown",
+            "stove_power_level": None,
+            "stove_ambient_temp": None,
+            "stove_setpoint_temp": None,
+            "stove_alarms": [],
+            "stove_pellets_low": None,
+            "stove_runtime_today": None,
+            "estimated_consumption_stove": None,
+        }
+
     async def _async_midnight_reset(self, now: datetime) -> None:
         """Handle midnight reset for daily consumption tracking."""
         from . import async_middleware_update_snapshot
 
         await async_middleware_update_snapshot(self.hass, self.entry_id)
+
+        # Reset runtime samples
+        self._runtime_samples = []
+        self._today_date = date.today()
+
         await self.async_refresh()
         _LOGGER.info("Daily consumption reset and snapshot created")
-
-
-# Import defaults to avoid circular import
-from .const import (
-    DEFAULT_BAG_WEIGHT_KG,
-    DEFAULT_SILO_CAPACITY_BAGS,
-    STORE_BAG_WEIGHT_KG,
-    STORE_SILO_CAPACITY_BAGS,
-)
-import logging
-
-_LOGGER = logging.getLogger(__name__)

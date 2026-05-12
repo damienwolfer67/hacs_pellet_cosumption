@@ -1,0 +1,81 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Pellet Consumption Tracker Configuration",
+        "description": "Configure your pellet silo settings.",
+        "data": {
+          "silo_capacity_bags": "Silo capacity (number of bags)",
+          "bag_weight_kg": "Bag weight (kg)",
+          "pellet_price_eur_kg": "Pellet price (€/kg)",
+          "name": "Instance name (optional)"
+        }
+      }
+    },
+    "error": {
+      "unknown": "Unknown error"
+    },
+    "abort": {
+      "already_configured": "This instance is already configured"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Modify options",
+        "description": "Adjust your pellet silo settings.",
+        "data": {
+          "silo_capacity_bags": "Silo capacity (number of bags)",
+          "bag_weight_kg": "Bag weight (kg)",
+          "pellet_price_eur_kg": "Pellet price (€/kg)"
+        }
+      }
+    }
+  },
+  "services": {
+    "add_pellets": {
+      "name": "Add pellets",
+      "description": "Add bags of pellets to the silo",
+      "fields": {
+        "bags": {
+          "name": "Bags",
+          "description": "Number of bags to add"
+        }
+      }
+    },
+    "set_silo_capacity": {
+      "name": "Set silo capacity",
+      "description": "Change the maximum capacity of the silo",
+      "fields": {
+        "bags": {
+          "name": "Capacity (bags)",
+          "description": "New capacity in bags"
+        }
+      }
+    },
+    "set_bag_weight": {
+      "name": "Set bag weight",
+      "description": "Change the weight of one pellet bag",
+      "fields": {
+        "weight": {
+          "name": "Weight (kg)",
+          "description": "New weight in kilograms"
+        }
+      }
+    },
+    "set_pellet_price": {
+      "name": "Set pellet price",
+      "description": "Change the price per kilogram of pellets",
+      "fields": {
+        "price": {
+          "name": "Price (€/kg)",
+          "description": "New price in EUR per kg"
+        }
+      }
+    },
+    "reset_season": {
+      "name": "Reset season",
+      "description": "Reset all seasonal statistics (cost, history)"
+    }
+  }
+}

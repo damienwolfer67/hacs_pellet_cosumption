@@ -1,0 +1,81 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configuration du Tracker de Consommation de Pellets",
+        "description": "Configurez les paramètres de votre silo à pellets.",
+        "data": {
+          "silo_capacity_bags": "Capacité du silo (nombre de sacs)",
+          "bag_weight_kg": "Poids d'un sac (kg)",
+          "pellet_price_eur_kg": "Prix des pellets (€/kg)",
+          "name": "Nom de l'instance (optionnel)"
+        }
+      }
+    },
+    "error": {
+      "unknown": "Erreur inconnue"
+    },
+    "abort": {
+      "already_configured": "Cette instance est déjà configurée"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Modifier les options",
+        "description": "Ajustez les paramètres de votre silo à pellets.",
+        "data": {
+          "silo_capacity_bags": "Capacité du silo (nombre de sacs)",
+          "bag_weight_kg": "Poids d'un sac (kg)",
+          "pellet_price_eur_kg": "Prix des pellets (€/kg)"
+        }
+      }
+    }
+  },
+  "services": {
+    "add_pellets": {
+      "name": "Ajouter des pellets",
+      "description": "Ajoute des sacs de pellets au silo",
+      "fields": {
+        "bags": {
+          "name": "Sacs",
+          "description": "Nombre de sacs à ajouter"
+        }
+      }
+    },
+    "set_silo_capacity": {
+      "name": "Définir la capacité du silo",
+      "description": "Modifie la capacité maximale du silo",
+      "fields": {
+        "bags": {
+          "name": "Capacité (sacs)",
+          "description": "Nouvelle capacité en sacs"
+        }
+      }
+    },
+    "set_bag_weight": {
+      "name": "Définir le poids d'un sac",
+      "description": "Modifie le poids d'un sac de pellets",
+      "fields": {
+        "weight": {
+          "name": "Poids (kg)",
+          "description": "Nouveau poids en kilogrammes"
+        }
+      }
+    },
+    "set_pellet_price": {
+      "name": "Définir le prix des pellets",
+      "description": "Modifie le prix au kilogramme des pellets",
+      "fields": {
+        "price": {
+          "name": "Prix (€/kg)",
+          "description": "Nouveau prix en euros par kg"
+        }
+      }
+    },
+    "reset_season": {
+      "name": "Réinitialiser la saison",
+      "description": "Réinitialise toutes les statistiques de la saison (coût, historique)"
+    }
+  }
+}

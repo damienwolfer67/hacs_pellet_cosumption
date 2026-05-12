@@ -1,0 +1,64 @@
+add_pellets:
+  name: "Add pellets"
+  description: "Add bags of pellets to the silo"
+  fields:
+    bags:
+      name: "Bags"
+      description: "Number of bags to add to the silo"
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 1000
+          step: 1
+          mode: box
+
+set_silo_capacity:
+  name: "Set silo capacity"
+  description: "Set the maximum capacity of the silo in bags"
+  fields:
+    bags:
+      name: "Capacity (bags)"
+      description: "Total capacity of the silo in bags"
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 1000
+          step: 1
+          mode: box
+
+set_bag_weight:
+  name: "Set bag weight"
+  description: "Set the weight of one pellet bag in kg"
+  fields:
+    weight:
+      name: "Weight (kg)"
+      description: "Weight of one bag in kilograms"
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 50
+          step: 0.1
+          mode: box
+
+set_pellet_price:
+  name: "Set pellet price"
+  description: "Set the price of pellets per kg in EUR"
+  fields:
+    price:
+      name: "Price (EUR/kg)"
+      description: "Price per kilogram in EUR"
+      required: true
+      selector:
+        number:
+          min: 0
+          max: 10
+          step: 0.01
+          mode: box
+
+reset_season:
+  name: "Reset season"
+  description: "Reset all seasonal statistics (cost, consumption history)"
+  fields: {}
